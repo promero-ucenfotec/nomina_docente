@@ -6,7 +6,31 @@
 <title>Nómina Docente · CENFOTEC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+  // Load Google Identity Services only after DOM is ready, with retry logic
+  function loadGoogleScript() {
+    return new Promise((resolve, reject) => {
+      if (typeof google !== 'undefined') { resolve(); return; }
+      const s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.onload = () => {
+        // Wait until google.accounts is actually available
+        let tries = 0;
+        const check = setInterval(() => {
+          if (typeof google !== 'undefined' && google.accounts) {
+            clearInterval(check);
+            resolve();
+          } else if (++tries > 40) {
+            clearInterval(check);
+            reject(new Error('Google script timeout'));
+          }
+        }, 100);
+      };
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+</script>
 <style>
   :root {
     --navy:    #0d1b3e;
@@ -705,16 +729,23 @@ document.getElementById('btn-logout').addEventListener('click', () => {
 });
 
 // Render sign-in button in login screen
-window.addEventListener('load', () => {
-  google.accounts.id.initialize({
-    client_id: CLIENT_ID,
-    callback: handleCredential,
-  });
-  google.accounts.id.renderButton(
-    document.getElementById('google-btn-login'),
-    { theme: 'filled_blue', size: 'large', text: 'signin_with', shape: 'rectangular', width: 280 }
-  );
-  google.accounts.id.prompt();
+window.addEventListener('load', async () => {
+  try {
+    await loadGoogleScript();
+    google.accounts.id.initialize({
+      client_id: CLIENT_ID,
+      callback: handleCredential,
+    });
+    google.accounts.id.renderButton(
+      document.getElementById('google-btn-login'),
+      { theme: 'filled_blue', size: 'large', text: 'signin_with', shape: 'rectangular', width: 280 }
+    );
+    google.accounts.id.prompt();
+  } catch (e) {
+    console.warn('Google Identity Services no pudo cargar:', e);
+    document.getElementById('google-btn-login').innerHTML =
+      '<p style="color:#dc2626;font-size:13px;line-height:1.6">⚠️ No se pudo cargar el login de Google.<br>Abrí la app en un servidor web o en tu dominio autorizado en Google Console.</p>';
+  }
 });
 
 // ── TSE LOOKUP ──
