@@ -7,22 +7,18 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
 <script>
-  // Load Google Identity Services only after DOM is ready, with retry logic
   function loadGoogleScript() {
     return new Promise((resolve, reject) => {
-      if (typeof google !== 'undefined') { resolve(); return; }
+      if (typeof google !== 'undefined' && google.accounts) { resolve(); return; }
       const s = document.createElement('script');
       s.src = 'https://accounts.google.com/gsi/client';
       s.onload = () => {
-        // Wait until google.accounts is actually available
         let tries = 0;
         const check = setInterval(() => {
           if (typeof google !== 'undefined' && google.accounts) {
-            clearInterval(check);
-            resolve();
+            clearInterval(check); resolve();
           } else if (++tries > 40) {
-            clearInterval(check);
-            reject(new Error('Google script timeout'));
+            clearInterval(check); reject(new Error('timeout'));
           }
         }, 100);
       };
@@ -359,21 +355,7 @@
       <div class="email" id="user-email"></div>
     </div>
     <button id="btn-logout">Cerrar sesión</button>
-    <div id="g_id_onload"
-         data-client_id="147141081595-mtlv4l70drmlb50aae44bso40kr02n9o.apps.googleusercontent.com"
-         data-callback="handleCredential"
-         data-auto_prompt="false">
-    </div>
-    <div class="g_id_signin"
-         data-type="standard"
-         data-size="medium"
-         data-theme="filled_blue"
-         data-text="signin_with"
-         data-shape="rectangular"
-         data-logo_alignment="left"
-         style="display:none"
-         id="google-btn">
-    </div>
+
   </div>
 </header>
 
