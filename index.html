@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nómina Docente · CENFOTEC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+  :root {
+    --navy:    #0d1b3e;
+    --blue:    #164a98;
+    --sky:     #3b82f6;
+    --ice:     #e8f0fe;
+    --white:   #ffffff;
+    --grey-50: #f8fafc;
+    --grey-100:#f1f5f9;
+    --grey-300:#cbd5e1;
+    --grey-500:#64748b;
+    --grey-700:#334155;
+    --green:   #059669;
+    --red:     #dc2626;
+    --amber:   #d97706;
+    --radius:  10px;
+    --shadow:  0 4px 24px rgba(13,27,62,.10);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--grey-50);
+    color: var(--grey-700);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--navy);
+    padding: 0 32px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,.25);
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--blue);
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+  }
+  .logo-icon svg { width: 20px; height: 20px; }
+  .logo-text { color: var(--white); }
+  .logo-text strong { font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 700; display: block; letter-spacing: .3px; }
+  .logo-text span { font-size: 11px; color: var(--grey-300); letter-spacing: .5px; text-transform: uppercase; }
+  #auth-zone { display: flex; align-items: center; gap: 12px; }
+  #user-info { color: var(--white); font-size: 13px; text-align: right; display: none; }
+  #user-info .name { font-weight: 600; }
+  #user-info .email { color: var(--grey-300); font-size: 11px; }
+  #btn-logout {
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.2);
+    color: var(--white);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    display: none;
+    transition: background .2s;
+  }
+  #btn-logout:hover { background: rgba(255,255,255,.2); }
+
+  /* ── MAIN ── */
+  main { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* ── LOGIN SCREEN ── */
+  #login-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+    gap: 32px;
+    text-align: center;
+  }
+  .login-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 52px 48px;
+    box-shadow: var(--shadow);
+    max-width: 440px;
+    width: 100%;
+  }
+  .login-card .icon-big {
+    width: 64px; height: 64px;
+    background: var(--ice);
+    border-radius: 16px;
+    display: grid; place-items: center;
+    margin: 0 auto 24px;
+  }
+  .login-card h2 { font-family: 'Sora', sans-serif; font-size: 22px; color: var(--navy); margin-bottom: 8px; }
+  .login-card p { color: var(--grey-500); font-size: 14px; margin-bottom: 32px; line-height: 1.6; }
+
+  /* ── FORM SCREEN ── */
+  #form-screen { display: none; }
+
+  .page-title {
+    margin-bottom: 32px;
+  }
+  .page-title h1 { font-family: 'Sora', sans-serif; font-size: 26px; color: var(--navy); font-weight: 700; margin-bottom: 4px; }
+  .page-title p { color: var(--grey-500); font-size: 14px; }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 20px 28px 16px;
+    border-bottom: 1px solid var(--grey-100);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-header .step {
+    width: 28px; height: 28px;
+    background: var(--blue);
+    color: var(--white);
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+  .card-header h3 { font-family: 'Sora', sans-serif; font-size: 15px; color: var(--navy); font-weight: 600; }
+  .card-header p { color: var(--grey-500); font-size: 12px; margin-top: 2px; }
+  .card-body { padding: 24px 28px; }
+
+  /* ── CEDULA LOOKUP ── */
+  .cedula-row { display: flex; gap: 10px; align-items: flex-end; }
+  .cedula-row .field-wrap { flex: 1; }
+  #btn-lookup {
+    height: 44px;
+    padding: 0 20px;
+    background: var(--blue);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .2s, transform .1s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  #btn-lookup:hover { background: #0d3a7a; }
+  #btn-lookup:active { transform: scale(.98); }
+  #btn-lookup:disabled { background: var(--grey-300); cursor: not-allowed; }
+  .lookup-spinner { display: none; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.4); border-top-color: white; border-radius: 50%; animation: spin .7s linear infinite; }
+
+  /* ── NOMBRE BADGE ── */
+  #nombre-badge {
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    display: none;
+    align-items: center;
+    gap: 10px;
+  }
+  #nombre-badge .check { color: var(--green); font-size: 18px; }
+  #nombre-badge .nombre-text strong { display: block; font-size: 14px; color: #14532d; }
+  #nombre-badge .nombre-text span { font-size: 12px; color: var(--green); }
+
+  /* ── GRID ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px 20px; }
+  .col-full { grid-column: 1 / -1; }
+
+  /* ── FIELDS ── */
+  .field-wrap { display: flex; flex-direction: column; gap: 5px; }
+  label { font-size: 12px; font-weight: 600; color: var(--grey-700); letter-spacing: .2px; }
+  label .req { color: var(--red); margin-left: 2px; }
+  input[type="text"], input[type="email"], input[type="date"], select, textarea {
+    height: 44px;
+    border: 1.5px solid var(--grey-300);
+    border-radius: var(--radius);
+    padding: 0 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--grey-700);
+    background: var(--white);
+    transition: border-color .2s, box-shadow .2s;
+    outline: none;
+    width: 100%;
+  }
+  textarea { height: auto; min-height: 80px; padding: 12px 14px; resize: vertical; }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--sky);
+    box-shadow: 0 0 0 3px rgba(59,130,246,.12);
+  }
+  input.readonly-field {
+    background: var(--grey-100);
+    color: var(--grey-500);
+    cursor: default;
+  }
+  select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+
+  /* checkbox group */
+  .check-group { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .check-pill { display: flex; align-items: center; gap: 6px; }
+  .check-pill input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--blue); cursor: pointer; }
+  .check-pill label { font-size: 12px; font-weight: 500; cursor: pointer; color: var(--grey-700); }
+
+  /* ── SECTION DIVIDER ── */
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--grey-500);
+    margin: 20px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--grey-100); }
+
+  /* ── SUBMIT ── */
+  .submit-zone {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  #btn-submit {
+    height: 50px;
+    padding: 0 36px;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background .2s, transform .1s;
+  }
+  #btn-submit:hover { background: var(--blue); }
+  #btn-submit:active { transform: scale(.98); }
+  #btn-submit:disabled { background: var(--grey-300); cursor: not-allowed; }
+  .submit-hint { font-size: 12px; color: var(--grey-500); max-width: 340px; line-height: 1.5; }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--navy);
+    color: var(--white);
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 8px 32px rgba(0,0,0,.25);
+    z-index: 9999;
+    transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+  #toast.success { background: var(--green); }
+  #toast.error { background: var(--red); }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── HELPER TEXT ── */
+  .helper { font-size: 11px; color: var(--grey-500); margin-top: 2px; }
+  .error-msg { font-size: 11px; color: var(--red); margin-top: 2px; display: none; }
+  input.invalid, select.invalid { border-color: var(--red); }
+
+  @media (max-width: 620px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .col-full { grid-column: 1; }
+    header { padding: 0 16px; }
+    main { padding: 24px 16px 60px; }
+    .card-body { padding: 20px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="10" cy="6" r="4" fill="white"/>
+        <path d="M3 17c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <strong>Nómina Docente</strong>
+      <span>UCENFOTEC · DCD</span>
+    </div>
+  </div>
+  <div id="auth-zone">
+    <div id="user-info">
+      <div class="name" id="user-name"></div>
+      <div class="email" id="user-email"></div>
+    </div>
+    <button id="btn-logout">Cerrar sesión</button>
+    <div id="g_id_onload"
+         data-client_id="147141081595-mtlv4l70drmlb50aae44bso40kr02n9o.apps.googleusercontent.com"
+         data-callback="handleCredential"
+         data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin"
+         data-type="standard"
+         data-size="medium"
+         data-theme="filled_blue"
+         data-text="signin_with"
+         data-shape="rectangular"
+         data-logo_alignment="left"
+         style="display:none"
+         id="google-btn">
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- LOGIN -->
+  <div id="login-screen">
+    <div class="login-card">
+      <div class="icon-big">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <rect x="4" y="8" width="24" height="18" rx="3" stroke="#164a98" stroke-width="2"/>
+          <path d="M10 14h12M10 19h8" stroke="#164a98" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="16" cy="5" r="3" fill="#164a98"/>
+        </svg>
+      </div>
+      <h2>Registro de Docentes</h2>
+      <p>Accedé con tu cuenta institucional de UCENFOTEC para agregar nuevos docentes a la base de datos de nómina.</p>
+      <div id="google-btn-login" style="display:flex; justify-content:center;"></div>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div id="form-screen">
+    <div class="page-title">
+      <h1>Agregar Docente</h1>
+      <p>Completá los campos a continuación. Los datos se guardarán directamente en la hoja Datos_Nómina.</p>
+    </div>
+
+    <!-- CARD 1: IDENTIFICACIÓN -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step">1</div>
+        <div>
+          <h3>Identificación</h3>
+          <p>Cédula y datos personales básicos</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="cedula-row">
+          <div class="field-wrap">
+            <label for="cedula">Número de Cédula <span class="req">*</span></label>
+            <input type="text" id="cedula" placeholder="ej: 1-1234-5678 o 108770098" maxlength="20" autocomplete="off">
+            <span class="error-msg" id="cedula-err">Ingresá la cédula para continuar.</span>
+          </div>
+          <button id="btn-lookup">
+            <span id="lookup-text">Consultar TSE</span>
+            <div class="lookup-spinner" id="lookup-spin"></div>
+          </button>
+        </div>
+
+        <div id="nombre-badge">
+          <span class="check">✓</span>
+          <div class="nombre-text">
+            <strong id="badge-nombre"></strong>
+            <span>Nombre extraído del Tribunal Supremo de Elecciones</span>
+          </div>
+        </div>
+
+        <div class="section-label">Datos personales</div>
+        <div class="grid-2">
+          <div class="field-wrap col-full">
+            <label for="nombre">Nombre completo <span class="req">*</span></label>
+            <input type="text" id="nombre" placeholder="Apellido1 Apellido2 Nombre(s)" style="text-transform:uppercase">
+            <span class="error-msg" id="nombre-err">El nombre es requerido.</span>
+          </div>
+          <div class="field-wrap">
+            <label for="correo">Correo Universidad</label>
+            <input type="email" id="correo" placeholder="usuario@ucenfotec.ac.cr">
+          </div>
+          <div class="field-wrap">
+            <label for="celular">Celular</label>
+            <input type="text" id="celular" placeholder="+506-XXXX-XXXX">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 2: VINCULACIÓN -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step">2</div>
+        <div>
+          <h3>Vinculación institucional</h3>
+          <p>Carrera principal, fecha de ingreso y estado</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="grid-2">
+          <div class="field-wrap">
+            <label for="carrera">Carrera principal</label>
+            <select id="carrera">
+              <option value="">— Seleccioná —</option>
+              <option>BISOFT</option>
+              <option>BITIC</option>
+              <option>MBD</option>
+              <option>MBD Virtual</option>
+              <option>MISAD</option>
+              <option>MISIA</option>
+              <option>MSEG</option>
+              <option>BSINF</option>
+              <option>MCIB</option>
+              <option>MAD</option>
+              <option>BTI</option>
+              <option>BCIB</option>
+              <option>BAE</option>
+              <option>BISIST</option>
+              <option>BIIND</option>
+              <option>Transitorio</option>
+            </select>
+          </div>
+          <div class="field-wrap">
+            <label for="contactable">¿Se puede contactar?</label>
+            <select id="contactable">
+              <option value="Sí">Sí</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+          <div class="field-wrap">
+            <label for="fecha-ingreso">Servicios en UCENFOTEC desde</label>
+            <input type="date" id="fecha-ingreso">
+          </div>
+          <div class="field-wrap">
+            <label for="fin-labores">Fin de labores</label>
+            <input type="date" id="fin-labores">
+            <span class="helper">Dejá vacío si sigue activo/a</span>
+          </div>
+        </div>
+
+        <div class="section-label">Carreras en CONESUP</div>
+        <div class="field-wrap">
+          <label>Carreras presentado</label>
+          <div class="check-group" id="carreras-check">
+            <label class="check-pill"><input type="checkbox" name="carr" value="BISOFT"><label>BISOFT</label></label>
+            <label class="check-pill"><input type="checkbox" name="carr" value="BITIC"><label>BITIC</label></label>
+            <label class="check-pill"><input type="checkbox" name="carr" value="MBD"><label>MBD</label></label>
+            <label class="check-pill"><input type="checkbox" name="carr" value="MBD Virtual"><label>MBD Virtual</label></label>
+            <label class="check-pill"><input type="checkbox" name="carr" value="MISAD"><label>MISAD</label></label>
+            <label class="check-pill"><input type="checkbox" name="carr" value="MISIA"><label>MISIA</label></label>
+            <label class="check-pill"><input type="checkbox" name="carr" value="MSEG"><label>MSEG</label></label>
+            <label class="check-pill"><input type="checkbox" name="carr" value="Transitorio"><label>Transitorio</label></label>
+            <label class="check-pill"><input type="checkbox" name="carr" value="BSINF"><label>BSINF</label></label>
+            <label class="check-pill"><input type="checkbox" name="carr" value="MCIB"><label>MCIB</label></label>
+            <label class="check-pill"><input type="checkbox" name="carr" value="MAD"><label>MAD</label></label>
+            <label class="check-pill"><input type="checkbox" name="carr" value="BTI"><label>BTI</label></label>
+            <label class="check-pill"><input type="checkbox" name="carr" value="BCIB"><label>BCIB</label></label>
+            <label class="check-pill"><input type="checkbox" name="carr" value="BAE"><label>BAE</label></label>
+            <label class="check-pill"><input type="checkbox" name="carr" value="BISIST"><label>BISIST</label></label>
+            <label class="check-pill"><input type="checkbox" name="carr" value="BIIND"><label>BIIND</label></label>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top:16px">
+          <div class="field-wrap">
+            <label for="aprobado-conesup">Aprobado en CONESUP</label>
+            <select id="aprobado-conesup">
+              <option value="No">No</option>
+              <option value="Si">Sí</option>
+            </select>
+          </div>
+          <div class="field-wrap">
+            <label for="sesion-reciente">Sesión más reciente</label>
+            <input type="text" id="sesion-reciente" placeholder="ej: BCIB-2026 27/01/2026 Art. 10 1004-2026">
+          </div>
+          <div class="field-wrap col-full">
+            <label for="carreras-nuevas">Carreras nuevas en las que fue presentado</label>
+            <input type="text" id="carreras-nuevas" placeholder="ej: BSINF, BISOFT">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 3: EXPERIENCIA -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step">3</div>
+        <div>
+          <h3>Experiencia</h3>
+          <p>Años de experiencia docente y profesional</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="section-label">Experiencia docente UCENFOTEC</div>
+        <div class="grid-3">
+          <div class="field-wrap">
+            <label for="exp-cenfotec-anios">Años</label>
+            <input type="text" id="exp-cenfotec-anios" placeholder="0">
+          </div>
+          <div class="field-wrap">
+            <label for="exp-cenfotec-meses">Meses</label>
+            <input type="text" id="exp-cenfotec-meses" placeholder="0">
+          </div>
+        </div>
+
+        <div class="section-label">Experiencia docente TOTAL</div>
+        <div class="grid-3">
+          <div class="field-wrap">
+            <label for="exp-total-anios">Años</label>
+            <input type="text" id="exp-total-anios" placeholder="0">
+          </div>
+          <div class="field-wrap">
+            <label for="exp-total-meses">Meses</label>
+            <input type="text" id="exp-total-meses" placeholder="0">
+          </div>
+        </div>
+
+        <div class="section-label">Experiencia profesional</div>
+        <div class="grid-3">
+          <div class="field-wrap">
+            <label for="exp-prof-anios">Años</label>
+            <input type="text" id="exp-prof-anios" placeholder="0">
+          </div>
+          <div class="field-wrap">
+            <label for="exp-prof-meses">Meses</label>
+            <input type="text" id="exp-prof-meses" placeholder="0">
+          </div>
+        </div>
+
+        <div class="field-wrap" style="margin-top:16px">
+          <label for="comentario-exp">Comentario de experiencia docente</label>
+          <textarea id="comentario-exp" placeholder="Observaciones sobre la experiencia (ej: Tiene 6 años en la UCR)"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 4: FORMACIÓN ACADÉMICA -->
+    <div class="card">
+      <div class="card-header">
+        <div class="step">4</div>
+        <div>
+          <h3>Formación académica</h3>
+          <p>Grado mayor y detalle de títulos</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="grid-2">
+          <div class="field-wrap">
+            <label for="grado-mayor">Grado académico mayor</label>
+            <select id="grado-mayor">
+              <option value="">— Seleccioná —</option>
+              <option>Bachillerato</option>
+              <option>Licenciatura</option>
+              <option>Maestría</option>
+              <option>Doctorado</option>
+              <option>Magister</option>
+              <option>Máster</option>
+            </select>
+          </div>
+          <div class="field-wrap">
+            <label for="venc-cedula">Vencimiento de cédula</label>
+            <input type="date" id="venc-cedula">
+          </div>
+        </div>
+
+        <div class="section-label">Títulos por nivel</div>
+        <div class="grid-2">
+          <div class="field-wrap col-full">
+            <label for="titulo-bach">Bachillerato</label>
+            <input type="text" id="titulo-bach" placeholder="ej: Bachillerato en Ingeniería en Computación (TEC)">
+          </div>
+          <div class="field-wrap col-full">
+            <label for="titulo-lic">Licenciatura</label>
+            <input type="text" id="titulo-lic" placeholder="ej: Licenciatura en Ingeniería Informática (UCR)">
+          </div>
+          <div class="field-wrap col-full">
+            <label for="titulo-mae">Maestría</label>
+            <input type="text" id="titulo-mae" placeholder="ej: Maestría en Administración de Proyectos (UCI)">
+          </div>
+          <div class="field-wrap col-full">
+            <label for="titulo-doc">Doctorado</label>
+            <input type="text" id="titulo-doc" placeholder="ej: Doctorado en Educación (ULATINA)">
+          </div>
+        </div>
+
+        <div class="section-label">Atestados</div>
+        <div class="grid-2">
+          <div class="field-wrap">
+            <label for="estado-atestados">Estado de los atestados</label>
+            <select id="estado-atestados">
+              <option value="">— Seleccioná —</option>
+              <option>Completo</option>
+              <option>Incompleto</option>
+              <option>Pendiente</option>
+            </select>
+          </div>
+          <div class="field-wrap">
+            <label for="plan-docente">Plan de Docente Competente</label>
+            <input type="text" id="plan-docente" placeholder="ej: Módulo 1, Módulo 2">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBMIT -->
+    <div class="submit-zone">
+      <p class="submit-hint">Los campos con <span style="color:var(--red)">*</span> son requeridos. Los campos automáticos (fórmulas) se calcularán en la hoja.</p>
+      <button id="btn-submit">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1v16M1 9h16" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+        Agregar docente
+      </button>
+    </div>
+  </div>
+</main>
+
+<div id="toast">
+  <span id="toast-icon">✓</span>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+const CLIENT_ID = '147141081595-mtlv4l70drmlb50aae44bso40kr02n9o.apps.googleusercontent.com';
+const SHEET_ID = '14r-YtsV_Ql6qPcMuOEAyuRP2_LIaRbUgFmrGe6iAyOo';
+const SHEET_NAME = 'Datos_Nómina';
+const SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
+
+let accessToken = null;
+let userProfile = null;
+
+// ── GOOGLE ONE TAP LOGIN ──
+function handleCredential(response) {
+  const payload = JSON.parse(atob(response.credential.split('.')[1]));
+  userProfile = payload;
+  document.getElementById('user-name').textContent = payload.name;
+  document.getElementById('user-email').textContent = payload.email;
+
+  // Now get an access token for Sheets API
+  const tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: (tokenResponse) => {
+      if (tokenResponse.error) { showToast('Error al obtener permisos.', 'error'); return; }
+      accessToken = tokenResponse.access_token;
+      showFormScreen();
+    },
+  });
+  tokenClient.requestAccessToken({ prompt: '' });
+}
+
+function showFormScreen() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('form-screen').style.display = 'block';
+  document.getElementById('user-info').style.display = 'block';
+  document.getElementById('btn-logout').style.display = 'block';
+  document.getElementById('google-btn').style.display = 'none';
+}
+
+document.getElementById('btn-logout').addEventListener('click', () => {
+  accessToken = null;
+  userProfile = null;
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('form-screen').style.display = 'none';
+  document.getElementById('user-info').style.display = 'none';
+  document.getElementById('btn-logout').style.display = 'none';
+  document.getElementById('google-btn').style.display = 'block';
+  resetForm();
+});
+
+// Render sign-in button in login screen
+window.addEventListener('load', () => {
+  google.accounts.id.initialize({
+    client_id: CLIENT_ID,
+    callback: handleCredential,
+  });
+  google.accounts.id.renderButton(
+    document.getElementById('google-btn-login'),
+    { theme: 'filled_blue', size: 'large', text: 'signin_with', shape: 'rectangular', width: 280 }
+  );
+  google.accounts.id.prompt();
+});
+
+// ── TSE LOOKUP ──
+document.getElementById('btn-lookup').addEventListener('click', async () => {
+  const raw = document.getElementById('cedula').value.trim();
+  if (!raw) { showError('cedula-err', 'Ingresá un número de cédula.'); return; }
+
+  const cedula = raw.replace(/[-\s]/g, '');
+  const btn = document.getElementById('btn-lookup');
+  const spinner = document.getElementById('lookup-spin');
+  const text = document.getElementById('lookup-text');
+
+  btn.disabled = true;
+  spinner.style.display = 'block';
+  text.textContent = 'Consultando…';
+  hideNombreBadge();
+
+  try {
+    // POST to TSE via AllOrigins proxy
+    const formData = `numerocedula=${encodeURIComponent(cedula)}&tipoConsulta=1&buscar=Buscar`;
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent('https://servicioselectorales.tse.go.cr/chc/consulta_cedula.aspx')}`;
+
+    const resp = await fetch(proxyUrl, {
+      method: 'GET', // AllOrigins only supports GET; we'll use a different approach
+    });
+
+    // Since AllOrigins doesn't support POST, we use a direct approach with a CORS proxy
+    // Try api.allorigins for GET first to obtain __VIEWSTATE, then POST
+    throw new Error('USE_DIRECT');
+  } catch (e) {
+    // Fallback: use corsproxy.io or direct POST
+    try {
+      const cedula = raw.replace(/[-\s]/g, '');
+      const nombre = await consultarTSE(cedula);
+      if (nombre) {
+        document.getElementById('nombre').value = nombre;
+        document.getElementById('nombre').style.textTransform = 'uppercase';
+        document.getElementById('badge-nombre').textContent = '';
+        document.getElementById('badge-nombre').innerHTML = '';
+        document.getElementById('badge-nombre').id = 'badge-nombre'; // reset
+        document.getElementById('badge-nombre').textContent = nombre;
+
+        // Show badge
+        const badge = document.getElementById('nombre-badge');
+        document.getElementById('badge-nombre').textContent = nombre;
+        badge.style.display = 'flex';
+        showToast('Nombre encontrado en el TSE', 'success');
+      } else {
+        showToast('No se encontró el nombre. Ingresalo manualmente.', 'error');
+      }
+    } catch (err) {
+      showToast('Error al consultar el TSE. Ingresá el nombre manualmente.', 'error');
+    }
+  }
+
+  btn.disabled = false;
+  spinner.style.display = 'none';
+  text.textContent = 'Consultar TSE';
+});
+
+async function consultarTSE(cedula) {
+  // Step 1: GET the page to extract hidden fields
+  const pageUrl = 'https://servicioselectorales.tse.go.cr/chc/consulta_cedula.aspx';
+  const proxyBase = 'https://api.allorigins.win/raw?url=';
+
+  const getResp = await fetch(proxyBase + encodeURIComponent(pageUrl));
+  if (!getResp.ok) throw new Error('no get');
+  const html = await getResp.text();
+
+  // Extract hidden fields
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  const vs = doc.querySelector('#__VIEWSTATE')?.value || '';
+  const vsg = doc.querySelector('#__VIEWSTATEGENERATOR')?.value || '';
+  const ev = doc.querySelector('#__EVENTVALIDATION')?.value || '';
+
+  // Step 2: POST with cédula
+  const body = new URLSearchParams({
+    '__VIEWSTATE': vs,
+    '__VIEWSTATEGENERATOR': vsg,
+    '__EVENTVALIDATION': ev,
+    'txtcedula': cedula,
+    'btnBuscar': 'Buscar'
+  });
+
+  // Use allorigins POST via raw fetch — allorigins doesn't support POST bodies,
+  // so we encode as a data URL approach
+  // Alternative: use a different proxy that supports POST
+  const postUrl = `https://corsproxy.io/?${encodeURIComponent(pageUrl)}`;
+  const postResp = await fetch(postUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body.toString(),
+  });
+
+  if (!postResp.ok) throw new Error('no post');
+  const result = await postResp.text();
+  const rdoc = parser.parseFromString(result, 'text/html');
+
+  // Try to find the name in the response
+  // TSE returns the name in a label or span
+  const candidates = rdoc.querySelectorAll('span, td, label, div');
+  for (const el of candidates) {
+    const txt = el.textContent.trim();
+    // Name pattern: 2-4 words, all caps
+    if (/^[A-ZÁÉÍÓÚÜÑ]{2,}(\s[A-ZÁÉÍÓÚÜÑ]{2,}){1,4}$/.test(txt) && txt.length > 8) {
+      // Skip known labels
+      if (['TRIBUNAL', 'SUPREMO', 'ELECCIONES', 'CONSULTA', 'CÉDULA', 'RESULTADO', 'NOMBRE'].includes(txt)) continue;
+      return txt;
+    }
+  }
+
+  // Fallback: search for known TSE field
+  const nombre1 = rdoc.querySelector('#lblnombre1')?.textContent?.trim();
+  const nombre2 = rdoc.querySelector('#lblnombre2')?.textContent?.trim();
+  const apellido1 = rdoc.querySelector('#lblapellido1')?.textContent?.trim();
+  const apellido2 = rdoc.querySelector('#lblapellido2')?.textContent?.trim();
+
+  if (apellido1 || nombre1) {
+    return [apellido1, apellido2, nombre1, nombre2].filter(Boolean).join(' ').toUpperCase();
+  }
+
+  return null;
+}
+
+function hideNombreBadge() {
+  document.getElementById('nombre-badge').style.display = 'none';
+}
+
+// ── SUBMIT ──
+document.getElementById('btn-submit').addEventListener('click', async () => {
+  if (!accessToken) { showToast('Debes iniciar sesión primero.', 'error'); return; }
+  if (!validate()) return;
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.innerHTML = `<div class="lookup-spinner" style="display:block;border-top-color:white"></div> Guardando…`;
+
+  try {
+    const row = buildRow();
+    await appendRow(row);
+    showToast('Docente agregado correctamente ✓', 'success');
+    resetForm();
+  } catch (e) {
+    console.error(e);
+    showToast('Error al guardar. Revisá la consola.', 'error');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1v16M1 9h16" stroke="white" stroke-width="2" stroke-linecap="round"/></svg> Agregar docente`;
+});
+
+function validate() {
+  let ok = true;
+  const cedula = document.getElementById('cedula').value.trim();
+  const nombre = document.getElementById('nombre').value.trim();
+  if (!cedula) { showError('cedula-err', 'La cédula es requerida.'); ok = false; } else hideError('cedula-err');
+  if (!nombre) { showError('nombre-err', 'El nombre es requerido.'); ok = false; } else hideError('nombre-err');
+  return ok;
+}
+
+function showError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideError(id) {
+  document.getElementById(id).style.display = 'none';
+}
+
+function buildRow() {
+  // Today as Excel serial number
+  const today = excelDate(new Date());
+  const cedula = document.getElementById('cedula').value.trim().replace(/[-\s]/g, '');
+  const nombre = document.getElementById('nombre').value.trim().toUpperCase();
+  const correo = document.getElementById('correo').value.trim();
+  const celular = document.getElementById('celular').value.trim();
+  const carrera = document.getElementById('carrera').value;
+  const contactable = document.getElementById('contactable').value;
+  const fechaIngreso = isoToExcel(document.getElementById('fecha-ingreso').value);
+  const finLabores = isoToExcel(document.getElementById('fin-labores').value);
+  const carreras = Array.from(document.querySelectorAll('input[name="carr"]:checked')).map(c => c.value);
+  const carrerasStr = carreras.map(c => {
+    // Format like existing data: "BISOFT - 2025"
+    return c;
+  }).join(', ');
+  const carrerasNuevas = document.getElementById('carreras-nuevas').value.trim();
+  const aprobado = document.getElementById('aprobado-conesup').value;
+  const sesion = document.getElementById('sesion-reciente').value.trim();
+
+  const expCenfAnios = parseInt(document.getElementById('exp-cenfotec-anios').value) || 0;
+  const expCenfMeses = parseInt(document.getElementById('exp-cenfotec-meses').value) || 0;
+  const expTotAnios  = parseFloat(document.getElementById('exp-total-anios').value) || '';
+  const expTotMeses  = parseFloat(document.getElementById('exp-total-meses').value) || '';
+  const comentarioExp = document.getElementById('comentario-exp').value.trim();
+  const expProfAnios = parseFloat(document.getElementById('exp-prof-anios').value) || '';
+  const expProfMeses = parseFloat(document.getElementById('exp-prof-meses').value) || '';
+
+  const grado = document.getElementById('grado-mayor').value;
+  const bach  = document.getElementById('titulo-bach').value.trim();
+  const lic   = document.getElementById('titulo-lic').value.trim();
+  const mae   = document.getElementById('titulo-mae').value.trim();
+  const doc2  = document.getElementById('titulo-doc').value.trim();
+  const vencCedula = isoToExcel(document.getElementById('venc-cedula').value);
+  const estadoAtest = document.getElementById('estado-atestados').value;
+  const planDocente = document.getElementById('plan-docente').value.trim();
+
+  // Build títulos completos
+  const titulos = [bach, lic, mae, doc2].filter(Boolean).join('  ');
+
+  // The columns in order (matching the sheet):
+  // Fecha de actualización, ¿Se puede contactar?, Carrera, Cédula, Nombre,
+  // Correo Universidad, Celular, Servicios en UCENFOTEC desde, Fin de labores,
+  // Años Exp docente UCENFOTEC, Meses Exp docente UCENFOTEC,
+  // Años Exp docente TOTAL, Meses Exp docente TOTAL,
+  // Comentario de experiencia docente, Años Exp profesional, Meses Exp profesional,
+  // Carreras Presentado, Carreras Nuevas, Aprobado en CONESUP, Sesión más reciente,
+  // BISOFT, BITIC, MBD, MBD Virtual, MISAD, MISIA, MSEG, Transitorio,
+  // BSINF, MCIB, MAD, BTI, BCIB, BAE, Nómina CONESUP 2025, Estado de los atestados,
+  // Vencimiento de la cédula, ¿Cédula vencida?, CV, Cartas de Experiencia, Firma digital,
+  // Grado académico mayor, Bachillerato, Licenciatura, Maestría, Doctorado,
+  // Títulos Completos, Plan de Docente Competente, Depuración de carpeta
+
+  const carrerasCols = ['BISOFT','BITIC','MBD','MBD Virtual','MISAD','MISIA','MSEG','Transitorio','BSINF','MCIB','MAD','BTI','BCIB','BAE'];
+
+  const row = [
+    today,            // Fecha de actualización
+    contactable,      // ¿Se puede contactar?
+    carrera,          // Carrera
+    cedula,           // Cédula
+    nombre,           // Nombre
+    correo,           // Correo Universidad
+    celular,          // Celular
+    fechaIngreso,     // Servicios desde
+    finLabores,       // Fin de labores
+    expCenfAnios,     // Años exp UCENFOTEC
+    expCenfMeses,     // Meses exp UCENFOTEC
+    expTotAnios,      // Años exp TOTAL
+    expTotMeses,      // Meses exp TOTAL
+    comentarioExp,    // Comentario
+    expProfAnios,     // Años exp profesional
+    expProfMeses,     // Meses exp profesional
+    carrerasStr,      // Carreras Presentado
+    carrerasNuevas,   // Carreras Nuevas
+    aprobado,         // Aprobado en CONESUP
+    sesion,           // Sesión más reciente
+    // Carrera-specific session columns (leave blank — to be filled manually)
+    '', '', '', '', '', '', '', '', '', '', '', '', '', '',
+    'NO',             // Nómina CONESUP 2025 (default)
+    estadoAtest,      // Estado de los atestados
+    vencCedula,       // Vencimiento de la cédula
+    '',               // ¿Cédula vencida? (fórmula automática)
+    '',               // CV
+    '',               // Cartas de Experiencia
+    '',               // Firma digital
+    grado,            // Grado académico mayor
+    bach,             // Bachillerato
+    lic,              // Licenciatura
+    mae,              // Maestría
+    doc2,             // Doctorado
+    titulos,          // Títulos Completos
+    planDocente,      // Plan de Docente Competente
+    '',               // Depuración de carpeta (fórmula)
+  ];
+
+  return row;
+}
+
+async function appendRow(row) {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(SHEET_NAME)}!A1:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ values: [row] }),
+  });
+  if (!resp.ok) {
+    const err = await resp.json();
+    throw new Error(JSON.stringify(err));
+  }
+  return resp.json();
+}
+
+function excelDate(d) {
+  // Days since Jan 1, 1900 (Excel epoch, with leap year bug)
+  const start = new Date(Date.UTC(1900, 0, 1));
+  const diff = d - start;
+  return Math.floor(diff / 86400000) + 2;
+}
+
+function isoToExcel(iso) {
+  if (!iso) return '';
+  const d = new Date(iso + 'T12:00:00');
+  return excelDate(d);
+}
+
+// ── TOAST ──
+let toastTimer;
+function showToast(msg, type = '') {
+  const toast = document.getElementById('toast');
+  const icon = document.getElementById('toast-icon');
+  const msgEl = document.getElementById('toast-msg');
+  toast.className = type ? `show ${type}` : 'show';
+  icon.textContent = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+  msgEl.textContent = msg;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { toast.className = ''; }, 4000);
+}
+
+function resetForm() {
+  document.getElementById('cedula').value = '';
+  document.getElementById('nombre').value = '';
+  document.getElementById('correo').value = '';
+  document.getElementById('celular').value = '';
+  document.getElementById('carrera').value = '';
+  document.getElementById('contactable').value = 'Sí';
+  document.getElementById('fecha-ingreso').value = '';
+  document.getElementById('fin-labores').value = '';
+  document.querySelectorAll('input[name="carr"]').forEach(c => c.checked = false);
+  document.getElementById('aprobado-conesup').value = 'No';
+  document.getElementById('sesion-reciente').value = '';
+  document.getElementById('carreras-nuevas').value = '';
+  document.getElementById('exp-cenfotec-anios').value = '';
+  document.getElementById('exp-cenfotec-meses').value = '';
+  document.getElementById('exp-total-anios').value = '';
+  document.getElementById('exp-total-meses').value = '';
+  document.getElementById('exp-prof-anios').value = '';
+  document.getElementById('exp-prof-meses').value = '';
+  document.getElementById('comentario-exp').value = '';
+  document.getElementById('grado-mayor').value = '';
+  document.getElementById('titulo-bach').value = '';
+  document.getElementById('titulo-lic').value = '';
+  document.getElementById('titulo-mae').value = '';
+  document.getElementById('titulo-doc').value = '';
+  document.getElementById('venc-cedula').value = '';
+  document.getElementById('estado-atestados').value = '';
+  document.getElementById('plan-docente').value = '';
+  hideNombreBadge();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
